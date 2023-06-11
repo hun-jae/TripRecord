@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.hotplace.model.mapper.HotplaceMapper">	
+
+<resultMap type="hotplace" id="hotplaceResult">
+		<result column="bid" property="bid" />
+		<result column="uid" property="uid" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="numHeart" property="numHeart" />
+		<result column="content_id" property="contentId" />
+		<result column="first_image" property="imgSrc" />
+	</resultMap>
+
+	<sql id="search">
+		<if test="keyword != null and keyword != ''">
+			<if test="search_code != null and search_code != ''" >
+				
+				<if test="search_code == 'content_id'">
+					and b.${search_code} = #{keyword}
+				</if>
+			</if>
+		</if>
+	</sql>
+
+	<select id="searchList" parameterType="map" resultMap="hotplaceResult">
+		select b.bid, b.uid, b.title, b.content, b.num_heart, b.content_id, a.first_image
+		from board_hotplace b join attraction_info a
+		where b.content_id = a.content_id
+		<include refid="search"></include>
+		order by b.bid desc
+		limit #{start}, #{listsize}
+	</select>
+
+	<select id="search" parameterType="string" resultMap="hotplaceResult">
+		select b.bid, b.uid, b.title, b.content, b.num_heart, b.content_id, a.first_image
+		from attraction_info a join board_hotplace b
+		where a.content_id = b.content_id and (
+		(a.title like concat('%', #{keyword}, '%') or 
+		a.addr1 like concat('%', #{keyword}, '%') 
+		) or
+		(
+			b.title like concat('%', #{keyword}, '%') or 
+			b.content like concat('%', #{keyword}, '%') 
+		))
+	</select>
+	
+	
+	<insert id="write" parameterType="hotplace">
+		insert into board_hotplace (uid, title, content, content_id)
+		values (#{uid}, #{title}, #{content}, #{contentId})
+	</insert>
+	
+	<select id="view" parameterType="int" resultMap="hotplaceResult">
+		select bid, uid, title, content, num_heart, content_id
+		from board_hotplace
+		where bid = #{bid}
+	</select>
+	
+	<update id="update" parameterType="hotplace">
+		update board_hotplace
+		set title = #{title}, content = #{content}
+		where bid = #{bid}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from board_hotplace
+		where bid = #{bid}
+	</delete>
+
+	<update id="updateHeart" parameterType="int">
+		update board_hotplace
+		set num_heart = num_heart + 1
+		where bid = #{bid}
+	</update>
+
+</mapper>

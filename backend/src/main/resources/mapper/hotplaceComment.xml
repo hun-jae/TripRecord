@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.hotplacecomment.model.mapper.HotplaceCommentMapper">	
+	
+	<insert id="write" parameterType="hotplaceComment">
+		insert into comment_hotplace (bid, uid, comment)
+		values (#{bid}, #{uid}, #{comment})
+	</insert>
+
+	<select id="selectByBid" parameterType="int" resultType="hotplaceComment">
+		select bid, uid, cid, comment
+		from comment_hotplace 
+		where bid = #{bid}
+		<!-- order by b.bid desc -->
+	</select>
+	
+	<select id="selectByUid" parameterType="string" resultType="hotplaceComment">
+		select bid, uid, cid, comment
+		from comment_hotplace 
+		where uid = #{uid}
+		<!-- order by b.bid desc -->
+	</select>
+	
+	<update id="update" parameterType="hotplaceComment">
+		update comment_hotplace
+		set comment = #{comment}
+		where cid = #{cid}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from comment_hotplace
+		where cid = #{cid}
+	</delete>
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.tripwaycomment.model.mapper.TripwayCommentMapper">	
+	
+	<insert id="write" parameterType="tripwayComment">
+		insert into comment_tripway (bid, uid, comment)
+		values (#{bid}, #{uid}, #{comment})
+	</insert>
+
+	<select id="selectByBid" parameterType="int" resultType="tripwayComment">
+		select bid, uid, cid, comment
+		from comment_tripway 
+		where bid = #{bid}
+		<!-- order by b.bid desc -->
+	</select>
+	
+	<select id="selectByUid" parameterType="string" resultType="tripwayComment">
+		select bid, uid, cid, comment
+		from comment_tripway 
+		where uid = #{uid}
+		<!-- order by b.bid desc -->
+	</select>
+	
+	<update id="update" parameterType="tripwayComment">
+		update comment_tripway
+		set comment = #{comment}
+		where cid = #{cid}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from comment_tripway
+		where cid = #{cid}
+	</delete>
+
+</mapper>

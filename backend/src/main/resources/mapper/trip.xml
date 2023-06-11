@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.trip.model.mapper.TripMapper">
+
+	<resultMap type="Trip" id="tripResult">
+		<result column="content_id" property="contentId" />
+		<result column="content_type_id" property="contentTypeId" />
+		<result column="title" property="title" />
+		<result column="addr1" property="addr" />
+		<result column="first_image" property="imgSrc" />
+		<result column="sido_code" property="sidoCode" />
+		<result column="latitude" property="latitude" />
+		<result column="longitude" property="longitude" />
+		<result column="day" property="day" />
+		<result column="idx" property="idx" />
+	</resultMap>
+
+	<select id="searchList" parameterType="map" resultMap="tripResult">
+		select content_id, content_type_id, title, addr1, first_image, sido_code, latitude, longitude
+		from attraction_info	
+		where 1=1
+	  	<if test="sido_code != null and sido_code != ''">
+			and sido_code = #{sido_code}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (title like concat('%', #{keyword}, '%') or 
+			addr1 like concat('%', #{keyword}, '%') )
+		</if>
+		<if test="content_type_id != null and content_type_id != ''">
+			and content_type_id = #{content_type_id}
+		</if> 
+	</select> 
+	
+	<select id="searchByBid" parameterType="int" resultMap="tripResult">
+		select attraction_info.content_id, attraction_info.content_type_id, attraction_info.title, attraction_info.addr1, attraction_info.first_image, attraction_info.sido_code, attraction_info.latitude, attraction_info.longitude, attraction_for_board_tripway.day, attraction_for_board_tripway.idx
+		from attraction_info inner join attraction_for_board_tripway
+		on attraction_info.content_id = attraction_for_board_tripway.content_id
+		where attraction_for_board_tripway.bid= #{bid}
+	</select>
+	
+	<!--
+	게시글 작성할 때 여기서 attraction_for_board_tripway 에다가 (content_id, bid) 로 같이 실행시켜주자
+	-->
+	<select id="searchByContentId" parameterType="int" resultMap="tripResult">
+    select content_id, content_type_id, title, addr1, first_image, sido_code, latitude, longitude
+    from attraction_info    
+    where content_id= #{contentId}
+  </select>
+	
+	<insert id="registAttrForBoard" parameterType="map">
+		insert ignore into attraction_for_board_tripway (content_id, bid, day, idx, title, first_image)
+		values (#{content_id}, #{bid}, #{day}, #{idx}, #{title}, #{first_image})
+	</insert>
+
+	<delete id="deleteAttrForBoard" parameterType="int">
+		delete from attraction_for_board_tripway
+		where bid= #{bid}
+	</delete>
+
+
+	<select id="searchSido" resultType="map">
+	select sido_code, sido_name from sido;
+	</select>
+
+</mapper>
